@@ -23,7 +23,7 @@ const	struct	cmdent	cmdtab[] = {
 	{"sleep",	FALSE,	xsh_sleep},
 	{"uptime",	FALSE,	xsh_uptime},
 	{"?",		FALSE,	xsh_help},
-	{"hello",	FALSE,	xsh_hello};
+	{"hello",	FALSE,	xsh_hello},
 	{"test_mmu", 	FALSE, 	xsh_mmu}
 
 };

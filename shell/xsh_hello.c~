@@ -1,0 +1,9 @@
+#include <xinu.h>
+#include <stdio.h>
+
+shellcmd xsh_hello (int nargs, char *args[]) {
+  printf("Hello ");
+  printf("%s", args);
+  printf(". Welcome to the world of Xinu!!\n");
+	return 0;
+}	
