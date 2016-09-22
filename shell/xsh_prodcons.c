@@ -22,7 +22,12 @@ shellcmd xsh_prodcons(int32 nargs, char *args[])
   if (nargs == 2){
     count = atoi(args[1]);
   }
-  resume( create(consumer, 1024, 20, "consumer", 1, count));
-  resume( create(producer, 1024, 20, "producer", 1, count));
+
+  // semaphore set up
+  sid32 produced = semcreate(0);
+  sid32 consumed = semcreate(1);
+
+  resume( create(consumer, 1024, 20, "consumer", 3, count, consumed, produced));
+  resume( create(producer, 1024, 20, "producer", 3, count, consumed, produced));
   return (0);
 }
