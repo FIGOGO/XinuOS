@@ -1,13 +1,14 @@
 #include <xinu.h>
 #include <prodcons.h>
 
-int32 n = 0;                 //Definition for global variable 'n'
+int32 n;                 //Definition for global variable 'n'
 /*Now global variable n will be on Heap so it is accessible all the processes i.e. consume and produce*/
 
 shellcmd xsh_prodcons(int32 nargs, char *args[])
 {
   //Argument verifications and validations
   int32 count = 2000;
+  n = 0;
   //local varible to hold count
   //check args[1] if present assign value to count
 
