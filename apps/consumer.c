@@ -6,7 +6,7 @@ void consumer(int32 count) {
   // of n is less than or equal to count
   //print consumed value e.g. consumed : 8
   for (int32 i=1; i<=count; i++) {
-    printf("comsumed: %d \n", n);
+    printf ("comsumed: %d \n", n);
   }
 }
 

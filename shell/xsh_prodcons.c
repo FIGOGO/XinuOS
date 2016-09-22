@@ -7,7 +7,7 @@ int32 n = 0;                 //Definition for global variable 'n'
 shellcmd xsh_prodcons(int32 nargs, char *args[])
 {
   //Argument verifications and validations
-  int count = 2000;
+  int32 count = 2000;
   //local varible to hold count
   //check args[1] if present assign value to count
 
@@ -16,12 +16,11 @@ shellcmd xsh_prodcons(int32 nargs, char *args[])
 
   if (nargs > 2){
     printf ("too many arguments\n");
-    return -1;
+    return (-1);
   }
   if (nargs == 2){
-    count = (int32) args[1];
+    count = atoi(args[1]);
   }
-  printf ("count is %d \n", count);
   resume( create(consumer, 1024, 20, "consumer", 1, count));
   resume( create(producer, 1024, 20, "producer", 1, count));
   return (0);
