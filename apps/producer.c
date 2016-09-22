@@ -6,7 +6,7 @@ void producer(int32 count) {
   //produced value should get assigned to global variable 'n'.
   //print produced value e.g. produced : 8
   int32 i;
-  for(i = 1; i<count; i++){
+  for(i = 1; i<=count; i++){
     n++;
   }
 }

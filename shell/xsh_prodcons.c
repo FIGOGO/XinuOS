@@ -13,16 +13,16 @@ shellcmd xsh_prodcons(int32 nargs, char *args[])
 
   //create the process producer and consumer and put them in ready queue.
   //Look at the definations of function create and resume in the system folder for reference.
+
   if (nargs > 2){
     printf ("too many arguments\n");
     return -1;
   }
-
   if (nargs == 2){
     count = (int32) args[1];
-  
-  
-  resume( create(consumer, 1024, 20, "consumer", 1, 2000));
-  resume( create(producer, 1024, 20, "producer", 1, 2000));
-  return (0);}
+  }
+  printf ("count is %d \n", count);
+  resume( create(consumer, 1024, 20, "consumer", 1, count));
+  resume( create(producer, 1024, 20, "producer", 1, count));
+  return (0);
 }
