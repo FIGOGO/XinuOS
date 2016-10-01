@@ -10,8 +10,6 @@ syscall future_get(future *f, int *i) {
 
   *i = *(*f).value;
   (*f).state = FUTURE_WAITING;
-  printf("In get, i value is %d. At %d\n", *i, i);
-  printf("In get, the future value is %d. At %d\n", *(*f).value, (*f).value);
 
   if ((*f).pid > 0 && (*f).pid != currentpid) {
     resume((*f).pid);
