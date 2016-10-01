@@ -23,4 +23,7 @@ syscall future_free(future*);
 syscall future_get(future*, int*);
 syscall future_set(future*, int*);
 
+uint future_prod(future*);
+uint future_cons(future*);
+
 #endif /* _FUTURE_H_ */

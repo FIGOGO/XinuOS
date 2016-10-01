@@ -1,4 +1,5 @@
 #include <xinu.h>
+#include <future.h>
 #include <prodcons.h>
 
 int32 n;                 //Definition for global variable 'n'
@@ -23,11 +24,20 @@ shellcmd xsh_prodcons(int32 nargs, char *args[])
     count = atoi(args[1]);
   }
 
-  // semaphore set up
-  sid32 produced = semcreate(0);
-  sid32 consumed = semcreate(1);
+  future *f1, *f2, *f3;
 
-  resume( create(consumer, 1024, 20, "consumer", 3, count, consumed, produced));
-  resume( create(producer, 1024, 20, "producer", 3, count, consumed, produced));
+  f1 = future_alloc(FUTURE_EXCLUSIVE);
+  f2 = future_alloc(FUTURE_EXCLUSIVE);
+  f3 = future_alloc(FUTURE_EXCLUSIVE);
+  printf("Origional f value is %d. At %d\n", *(*f1).value,(*f1).value);
+
+  resume( create(future_prod, 1024, 20, "fprod1", 1, f1) );
+  resume( create(future_cons, 1024, 20, "fcons1", 1, f1) );
+  /*
+  resume( create(future_cons, 1024, 20, "fcons2", 1, f2) );
+  resume( create(future_prod, 1024, 20, "fprod2", 1, f2) );
+  resume( create(future_cons, 1024, 20, "fcons3", 1, f3) );
+  resume( create(future_prod, 1024, 20, "fprod3", 1, f3) );
+  */
   return (0);
 }
