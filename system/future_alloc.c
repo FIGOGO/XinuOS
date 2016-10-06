@@ -1,10 +1,12 @@
 #include <xinu.h>
 #include <future.h>
 
-future* future_alloc(int future_flags) {
-  future *pt = getmem(16);
-  int *value = getmem(4);
-  (*pt).value = value;
+future *future_alloc(int future_flags) {
+  future *pt = getmem(sizeof(future));
+  if ((int) pt == SYSERR) {
+    printf("Get memory failed");
+    return NULL;
+  }
   (*pt).flag = future_flags;
   (*pt).state = FUTURE_EMPTY;
   (*pt).pid = 0;

@@ -8,33 +8,38 @@ int32 n;                 //Definition for global variable 'n'
 shellcmd xsh_prodcons(int32 nargs, char *args[])
 {
   //Argument verifications and validations
-  int32 count = 2000;
   n = 0;
   //local varible to hold count
   //check args[1] if present assign value to count
-
-  //create the process producer and consumer and put them in ready queue.
-  //Look at the definations of function create and resume in the system folder for reference.
+  // if possible atoi(args[1]);
 
   if (nargs > 2){
     printf ("too many arguments\n");
     return (-1);
   }
+
   if (nargs == 2){
-    count = atoi(args[1]);
+    if (strncmp(args[1], "--help", 7) == 0) {
+      printf("This command is to coordinate the producer and consumer.\n");
+      printf("If the argument is -f, the command will use future to coordinate the producer and consumer\n");
+    }
+
+    else if (strncmp(args[1], "-f", 3) == 0) {
+      future *f1, *f2, *f3;
+
+      f1 = future_alloc(FUTURE_EXCLUSIVE);
+      f2 = future_alloc(FUTURE_EXCLUSIVE);
+      f3 = future_alloc(FUTURE_EXCLUSIVE);
+
+      resume( create(future_cons, 1024, 20, "fcons1", 1, f1) );
+      resume( create(future_prod, 1024, 20, "fprod1", 1, f1) );
+      resume( create(future_cons, 1024, 20, "fcons2", 1, f2) );
+      resume( create(future_prod, 1024, 20, "fprod2", 1, f2) );
+      resume( create(future_cons, 1024, 20, "fcons3", 1, f3) );
+      resume( create(future_prod, 1024, 20, "fprod3", 1, f3) );
+    }
+
   }
 
-  future *f1, *f2, *f3;
-
-  f1 = future_alloc(FUTURE_EXCLUSIVE);
-  f2 = future_alloc(FUTURE_EXCLUSIVE);
-  f3 = future_alloc(FUTURE_EXCLUSIVE);
-
-  resume( create(future_cons, 1024, 20, "fcons1", 1, f1) );
-  resume( create(future_prod, 1024, 20, "fprod1", 1, f1) );
-  resume( create(future_cons, 1024, 20, "fcons2", 1, f2) );
-  resume( create(future_prod, 1024, 20, "fprod2", 1, f2) );
-  resume( create(future_cons, 1024, 20, "fcons3", 1, f3) );
-  resume( create(future_prod, 1024, 20, "fprod3", 1, f3) );
-  return (0);
+ return (0);
 }

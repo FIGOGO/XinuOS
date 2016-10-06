@@ -9,6 +9,7 @@ void producer(int32 count, sid32 consumed, sid32 produced) {
   for(i = 1; i<=count; i++){
     wait (consumed);
     n++;
+printf("produced %d", n);
     signal(produced);
   }
 }

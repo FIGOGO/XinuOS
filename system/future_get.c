@@ -3,9 +3,14 @@
 
 syscall future_get(future *f, int *i) {
   int currentpid = getpid();
-  while ((*f).state < FUTURE_VALID) {
+
+  if ((*f).state < FUTURE_VALID) {
     (*f).pid = currentpid;
-    suspend(currentpid);
+    int status = suspend(currentpid);
+    if (status == SYSERR){
+      printf("Process suspend failed in future get");
+      return SYSERR;
+    }
   }
 
   *i = *(*f).value;

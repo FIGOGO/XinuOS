@@ -1,11 +1,16 @@
 #include <xinu.h>
 #include <future.h>
 
-syscall future_set(future* f, int* j) {
+syscall future_set(future *f, int *j) {
   int currentpid = getpid();
-  while ((*f).state == FUTURE_VALID) {
+
+  if ((*f).state == FUTURE_VALID) {
     (*f).pid = currentpid;
-    suspend(currentpid);
+    int status = suspend(currentpid);
+    if (status == SYSERR){
+      printf("Process suspend failed in future set");
+      return SYSERR;
+    }
   }
 
   *(*f).value = *j;

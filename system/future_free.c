@@ -1,10 +1,8 @@
 #include <xinu.h>
 #include <future.h>
 
-syscall future_free(future* f) {
-  freemem((*f).value, 4);
-  freemem(f, 16);
-  return OK;
+syscall future_free(future *f) {
+  return freemem(f, sizeof(future));
 }
 /*
 Description
