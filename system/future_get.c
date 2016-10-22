@@ -46,6 +46,7 @@ syscall future_get(future *f, int *i) {
     if (!isbadpid(f->pid) && f->pid != current_pid) {
       resume(f->pid);
     }
+
     restore(mask);
     return OK;
   }
