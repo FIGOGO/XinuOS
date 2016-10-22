@@ -57,8 +57,8 @@ shellcmd xsh_prodcons(int32 nargs, char *args[])
       // Test FUTURE_QUEUE
       resume( create(future_cons, 1024, 20, "fcons6", 1, f_queue) );
       resume( create(future_cons, 1024, 20, "fcons7", 1, f_queue) );
-      resume( create(future_cons, 1024, 20, "fcons7", 1, f_queue) );
-      resume( create(future_cons, 1024, 20, "fcons7", 1, f_queue) );
+      resume( create(future_cons, 1024, 20, "fcons8", 1, f_queue) );
+      resume( create(future_cons, 1024, 20, "fcons9", 1, f_queue) );
       resume( create(future_prod, 1024, 20, "fprod3", 1, f_queue) );
       resume( create(future_prod, 1024, 20, "fprod4", 1, f_queue) );
         resume( create(future_prod, 1024, 20, "fprod5", 1, f_queue) );
