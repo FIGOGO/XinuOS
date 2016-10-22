@@ -2,26 +2,60 @@
 #include <future.h>
 
 syscall future_get(future *f, int *i) {
-  int currentpid = getpid();
+  intmask mask;
+  mask = disable();
+  int current_pid = getpid();
 
-  if ((*f).state < FUTURE_VALID) {
-    (*f).pid = currentpid;
-    int status = suspend(currentpid);
-    if (status == SYSERR){
-      printf("Process suspend failed in future get");
-      return SYSERR;
+
+  if (f->flag == FUTURE_EXCLUSIVE) {
+    if ((*f).state < FUTURE_VALID) {
+      (*f).pid = current_pid;
+      int status = suspend(current_pid);
+      if (status == SYSERR){
+        printf("Process suspend failed in future get");
+        restore(mask);
+        return SYSERR;
+      }
     }
+
+    *i = *(*f).value;
+    (*f).state = FUTURE_WAITING;
+    if (!isbadpid(f->pid) && (*f).pid != current_pid) {
+      resume((*f).pid);
+    }
+    future_free(f);
+    restore(mask);
+    return OK;
   }
 
-  *i = *(*f).value;
-  (*f).state = FUTURE_WAITING;
+  else if (f->flag == FUTURE_SHARED) {
+    if (f->state < FUTURE_VALID) {
+      future_enqueue(getpid(), f->get_queue);
+      int status = suspend(getpid());
+      if (status == SYSERR){
+        printf("Process suspend failed in future get");
+        restore(mask);
+        return SYSERR;
+      }
+    }
 
-  if ((*f).pid > 0 && (*f).pid != currentpid) {
-    resume((*f).pid);
+    *i = *(f->value);
+    if (!isbadpid(f->pid) && f->pid != current_pid) {
+      resume(f->pid);
+    }
+    restore(mask);
+    return OK;
   }
 
-  return OK;
+  else if (f->flag == FUTURE_QUEUE) {
+    restore(mask);
+    return OK;
+  }
 
+  else {
+    restore(mask);
+    return SYSERR;
+  }
 }
 
 

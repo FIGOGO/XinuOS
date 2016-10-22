@@ -10,6 +10,31 @@ future *future_alloc(int future_flags) {
   (*pt).flag = future_flags;
   (*pt).state = FUTURE_EMPTY;
   (*pt).pid = 0;
+
+  pt->get_queue = getmem(sizeof(quentry)*(MAX_FUTURE_LENGTH+2));
+  pt->get_queue[0].qprev = NULL;
+  pt->get_queue[0].qnext = 1;
+  pt->get_queue[1].qprev = 0;
+  pt->get_queue[1].qnext = NULL;
+
+  pt->set_queue = getmem(sizeof(quentry)*(MAX_FUTURE_LENGTH+2));
+  pt->set_queue[0].qprev = NULL;
+  pt->set_queue[0].qnext = 1;
+  pt->set_queue[1].qprev = 0;
+  pt->set_queue[1].qnext = NULL;
+
+  for (int32 i = 0; i < (MAX_FUTURE_LENGTH+2); i++) {
+    pt->get_queue[i].processid = 0;
+    pt->set_queue[i].processid = 0;
+  }
+
+  /* quentry set_queue[MAX_FUTURE_LENGTH+2]; */
+  /* pt->set_queue = set_queue; */
+  /* set_queue[0].qprev = NULL; */
+  /* set_queue[0].qnext = 1; */
+  /* set_queue[1].qprev = 0; */
+  /* set_queue[1].qnext = NULL; */
+
   return pt;
 }
 

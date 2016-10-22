@@ -10,6 +10,6 @@ uint future_cons(future *fut) {
     return -1;
   }
   printf("it produced %d\n", i);
-  future_free(fut);
+  /* future_free(fut); */
   return OK;
 }

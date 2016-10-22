@@ -2,44 +2,59 @@
 #include <future.h>
 
 syscall future_set(future *f, int *j) {
-  int currentpid = getpid();
+  intmask mask;
+  int current_pid = getpid();
+  mask = disable();
 
-  if ((*f).state == FUTURE_VALID) {
-    (*f).pid = currentpid;
-    int status = suspend(currentpid);
-    if (status == SYSERR){
-      printf("Process suspend failed in future set");
-      return SYSERR;
+  if (f->flag == FUTURE_EXCLUSIVE) {
+    if ((*f).state == FUTURE_VALID) {
+      (*f).pid = current_pid;
+      int32 status = suspend(current_pid);
+      if (status == SYSERR){
+        printf("Process suspend failed in future set");
+        restore(mask);
+        return SYSERR;
+      }
     }
-  }
 
-  *(*f).value = *j;
-  (*f).state = FUTURE_VALID;
-
-  if ((*f).pid > 0 &&  (*f).pid != currentpid){
-    resume((*f).pid);
-  }
-
-  return OK;
-
-}
-
-  /*
-  if ((*f).state == FUTURE_EMPTY || (*f).state == FUTURE_WAITING) {
-    (*f).value = j;
+    *(*f).value = *j;
     (*f).state = FUTURE_VALID;
+    if ((*f).pid > 0 &&  (*f).pid != current_pid){
+      resume((*f).pid);
+    }
+    restore(mask);
     return OK;
   }
-  else return SYSERR;
+
+  else if (f->flag == FUTURE_SHARED){
+    if (f->state == FUTURE_VALID){
+      int32 status = suspend(current_pid);
+      if (status == SYSERR){
+        printf("Process suspend failed in future set");
+        restore(mask);
+        return SYSERR;
+      }
+    }
+
+    *(f->value) = *j;
+    f->state = FUTURE_VALID;
+
+    while (is_not_empty(f->get_queue)) {
+      resume(future_dequeue(f->get_queue));
+    }
+
+    restore(mask);
+    return OK;
+  }
+
+  else if (f->flag == FUTURE_QUEUE) {
+    restore(mask);
+    return OK;
+  }
+
+  else {
+    restore(mask);
+    return SYSERR;
+  }
 }
-/*
-Description
-  Set a value in a future and changes state from FUTURE_EMPTY or FUTURE_WAITING to FUTURE_VALID.
 
-Parameters
-  future *f: future in which to set the value int *value: result of an operation to be set as value in a future
-
-Return
-  syscall: SYSERR or OK
-
- */
