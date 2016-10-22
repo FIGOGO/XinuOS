@@ -2,6 +2,15 @@
 #include <future.h>
 
 syscall future_free(future *f) {
+  int32 status;
+  status = freemem(f->get_queue, sizeof(quentry)*(MAX_FUTURE_LENGTH+2));
+  if (status == SYSERR) {
+    return SYSERR;
+  }
+  status = freemem(f->set_queue, sizeof(quentry)*(MAX_FUTURE_LENGTH+2));
+  if (status == SYSERR) {
+    return SYSERR;
+  }
   return freemem(f, sizeof(future));
 }
 /*

@@ -2,7 +2,7 @@
 #include <future.h>
 
 pid32 future_enqueue(pid32 process_id, quentry *queue) {
-  int32 next = queue[0].qnext;
+  int32 origional = queue[1].qprev;
   int32 position = 0;
   for (int32 i = 2; i < (MAX_FUTURE_LENGTH+2); i++) {
     if (queue[i].processid == 0) {
@@ -15,11 +15,11 @@ pid32 future_enqueue(pid32 process_id, quentry *queue) {
     return SYSERR;
   }
 
-  queue[0].qnext = position;
+  queue[origional].qnext = position;
+  queue[1].qprev = position;
+  queue[position].qprev = origional;
+  queue[position].qnext = 1;
   queue[position].processid = process_id;
-  queue[position].qprev = 0;
-  queue[position].qnext = next;
-  queue[next].qprev = position;
   return OK;
 }
 

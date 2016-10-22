@@ -9,7 +9,7 @@ uint future_cons(future *fut) {
     printf("future_get failed\n");
     return -1;
   }
-  printf("it produced %d in process %s.\n", i, proctab[getpid()].prname);
+  printf("it produced %d, consumed in process %s.\n", i, proctab[getpid()].prname);
   /* future_free(fut); */
   return OK;
 }
