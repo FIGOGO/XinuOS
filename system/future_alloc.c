@@ -10,6 +10,7 @@ future *future_alloc(int future_flags) {
   (*pt).flag = future_flags;
   (*pt).state = FUTURE_EMPTY;
   (*pt).pid = 0;
+  pt->value = getmem(4);
 
   pt->get_queue = getmem(sizeof(quentry)*(MAX_FUTURE_LENGTH+2));
   if ((int) pt->get_queue == SYSERR) {

@@ -16,8 +16,7 @@ syscall future_set(future *f, int *j) {
         return SYSERR;
       }
     }
-
-    *(*f).value = *j;
+    *(f->value) = *j;
     (*f).state = FUTURE_VALID;
     if ((*f).pid > 0 &&  (*f).pid != current_pid){
       resume((*f).pid);
