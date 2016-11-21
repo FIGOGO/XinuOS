@@ -99,7 +99,7 @@ int fs_seek(int fd, int offset){
   if (file->state == FSTATE_CLOSED) {
     return SYSERR;
   }
-  if (file->fileptr < offset) {
+  if (file->fileptr + offset < 0) {
     return SYSERR;
   }
 
