@@ -46,9 +46,9 @@ int fs_write(int fd, void *buf, int nbytes);
 // change filetable.state to FSTATE_OPEN
 int fs_open(char *filename, int flags){
   for (int i = 0; i < next_open_fd; i++) {
-    if (*filename == fsd.root_dir.entry[fd].name) {
-      oft[fd].state = FSTATE_OPEN;
-      return fd;
+    if (*filename == fsd.root_dir.entry[i].name) {
+      oft[i].state = FSTATE_OPEN;
+      return i;
     }
   }
   return SYSERR;
