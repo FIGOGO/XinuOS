@@ -45,7 +45,13 @@ int fs_write(int fd, void *buf, int nbytes);
 
 // change filetable.state to FSTATE_OPEN
 int fs_open(char *filename, int flags){
-  return OK;
+  for (int i = 0; i < next_open_fd; i++) {
+    if (*filename == fsd.root_dir.entry[fd].name) {
+      oft[fd].state = FSTATE_OPEN;
+      return fd;
+    }
+  }
+  return SYSERR;
 }
 
 // change filetable.state to FSTATE_CLOSED
@@ -67,10 +73,10 @@ int fs_create(char *filename, int mode){
   file->state = FSTATE_OPEN;
   file->fileptr = 0;
 
-  // using dir in oft instead of directory 
+  // using dir in oft instead of directory
   file->de = &fsd.root_dir.entry[fd];
-  strncpy(file->de->name, filename, strlen(filename)); 
-  file->de->inode_num = inode_id; 
+  strncpy(file->de->name, filename, strlen(filename));
+  file->de->inode_num = inode_id;
 
   struct inode *in = &file->in;
   in->id = inode_id;
@@ -84,11 +90,6 @@ int fs_create(char *filename, int mode){
     in->blocks[i] = -1;
   }
   fs_put_inode_by_num(dev0, inode_id, in);
-
-  /* printf("file name should be %s\n", file->name); */
-  /* printf("file name is %s\n", root->entry[fd].name); */
-  /* strncpy(fsd.root_dir.entry[fd].name, filename, strlen(filename)); */
-  /* printf("file name after change is %s\n", root->entry[fd].name); */
 
   return fd;
 }
@@ -136,12 +137,6 @@ int fs_read(int fd, void *buf, int nbytes){
 }
 
 int fs_write(int fd, void *buf, int nbytes){
-  // what if there are already contests in the file
-
-  /* struct dirent *dir = oft[fd].de; */
-  /* printf("its file name is %s\n", oft[fd].de->name); */
-  /* printf("its file name is %s\n", dir->name); */
-
   struct filetable *file = &oft[fd];
   if (file->state == FSTATE_CLOSED) {
     return SYSERR;
