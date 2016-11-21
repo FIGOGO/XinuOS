@@ -68,8 +68,9 @@ int fs_create(char *filename, int mode){
   file->fileptr = 0;
 
   // using dir in oft instead of directory
-  strncpy(file->de->name, filename, strlen(filename));
-  file->de->inode_num = inode_id;
+  //strncpy(file->de->name, filename, strlen(filename));
+  printf("after copy\n");
+  //file->de->inode_num = inode_id;
 
   struct inode *in = &file->in;
   in->id = inode_id;
@@ -78,6 +79,7 @@ int fs_create(char *filename, int mode){
   in->nlink = 0;
   in->blocks[0] = next_open_dblock;
   next_open_dblock++;
+
   for (int i = 1; i < INODEBLOCKS; i++) {
     in->blocks[i] = -1;
   }
