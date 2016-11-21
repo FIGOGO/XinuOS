@@ -56,7 +56,7 @@ void testbitmask(void);
     // fs_mkfs(0, 128), initial filesystem
     fs_mkfs(0,DEFAULT_NUM_INODES); /* bsdev 0*/
 
-    // fs_testbitmask();
+    fs_testbitmask();
 
     buf1 = getmem(SIZE*sizeof(char));
     buf2 = getmem(SIZE*sizeof(char));
@@ -87,7 +87,7 @@ void testbitmask(void);
 
     //read the file
     rval = fs_read(fd, buf2, rval);
-    /* buf2[rval] = EOF; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation */
+    buf2[rval] = '\0'; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation 
 
     if(rval == 0)
     {
