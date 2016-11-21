@@ -67,10 +67,11 @@ int fs_create(char *filename, int mode){
   file->state = FSTATE_OPEN;
   file->fileptr = 0;
 
-  // using dir in oft instead of directory
-  //strncpy(file->de->name, filename, strlen(filename));
-  printf("after copy\n");
-  //file->de->inode_num = inode_id;
+  /* // using dir in oft instead of directory */
+  /* printf("before copy\n"); */
+  /* strncpy(file->de->name, filename, strlen(filename)); */
+  /* printf("after copy\n"); */
+  /* file->de->inode_num = inode_id; */
 
   struct inode *in = &file->in;
   in->id = inode_id;

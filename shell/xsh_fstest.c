@@ -55,18 +55,14 @@ void testbitmask(void);
     bs_mkdev(0, MDEV_BLOCK_SIZE, MDEV_NUM_BLOCKS); /* device "0" and default blocksize (=0) and count */
     // fs_mkfs(0, 128), initial filesystem
     fs_mkfs(0,DEFAULT_NUM_INODES); /* bsdev 0*/
+
     // fs_testbitmask();
-    printf("after fs_testbitmask\n");
-
-
 
     buf1 = getmem(SIZE*sizeof(char));
     buf2 = getmem(SIZE*sizeof(char));
 
-    printf("before create\n");
     // Create test file, 0_CREAT=11
     fd = fs_create("Test_File", O_CREAT);
-    printf("after create\n");
 
     // Fill buffer with random stuff
     for(i=0; i<SIZE; i++)
@@ -76,7 +72,7 @@ void testbitmask(void);
         buf1[i] = (char) j;
     }
 
-    printf("buf1's contest: %s\n", buf1);
+    /* printf("buf1's contest: %s\n", buf1); */
 
     rval = fs_write(fd,buf1,SIZE);
     if(rval == 0 || rval != SIZE )
@@ -91,16 +87,15 @@ void testbitmask(void);
 
     //read the file
     rval = fs_read(fd, buf2, rval);
-    //buf2[rval] = EOF; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation
+    /* buf2[rval] = EOF; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation */
 
     if(rval == 0)
     {
         printf("\n\r File read failed");
         goto clean_up;
     }
-    
+
     printf("\n\rContent of file %s\n",buf2);
-    printf("after print the buf contests\n");
 
     rval = fs_close(fd);
     if(rval != OK)
@@ -110,10 +105,8 @@ void testbitmask(void);
 
 
 clean_up:
-    printf("before free\n");
     freemem(buf1,SIZE);
     freemem(buf2,SIZE);
-    printf("after free\n");
 
 #else
     printf("No filesystem support\n");
