@@ -3,7 +3,7 @@
 #include <xinu.h>
 #include <stddef.h>
 #include <stdio.h>
- <string.h>
+#include <string.h>
 
 extern int dev0_numblocks;
 extern int dev0_blocksize;
@@ -43,7 +43,6 @@ int bs_mkdev(int dev, int blocksize, int numblocks) {
 
 }
 
-// read the data of specific location into the buf
 int bs_bread(int dev, int block, int offset, void *buf, int len) {
   char *bbase;
 

@@ -73,6 +73,8 @@ void testbitmask(void);
         buf1[i] = (char) j;
     }
 
+    printf("buf1's contest: %s\n", buf1);
+
     rval = fs_write(fd,buf1,SIZE);
     if(rval == 0 || rval != SIZE )
     {
@@ -94,7 +96,7 @@ void testbitmask(void);
         goto clean_up;
     }
 
-    printf("\n\rContent of file %s",buf2);
+    printf("\n\rContent of file %s\n",buf2);
 
     rval = fs_close(fd);
     if(rval != OK)

@@ -24,13 +24,16 @@ char block_cache[512];
 #define NUM_FD 16
 struct filetable oft[NUM_FD];
 int next_open_fd = 0;
-
+int next_open_inum = 0;
+int next_open_dblock = 0;
 
 #define INODES_PER_BLOCK (fsd.blocksz / sizeof(struct inode))
 #define NUM_INODE_BLOCKS (( (fsd.ninodes % INODES_PER_BLOCK) == 0) ? fsd.ninodes / INODES_PER_BLOCK : (fsd.ninodes / INODES_PER_BLOCK) + 1)
 #define FIRST_INODE_BLOCK 2
+#define FIRST_DATA_BLOCK (FIRST_INODE_BLOCK + NUM_INODE_BLOCKS)
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
+
 
 /* YOUR CODE GOES HERE */
 int fs_open(char *filename, int flags);
@@ -47,17 +50,38 @@ int fs_open(char *filename, int flags){
 
 // change filetable.state to FSTATE_CLOSED
 int fs_close(int fd){
+  if (fd < 0 || fd >= NUM_FD) {
+    return SYSERR;
+  }
+  oft[fd].state = FSTATE_CLOSED;
   return OK;
 }
 
 int fs_create(char *filename, int mode){
   int fd = next_open_fd;
+  int inode_id = next_open_inum;
   next_open_fd++;
+  next_open_inum++;
 
-  struct filetable *ftb = oft + fd;
-  struct directory *root = &fsd.root_dir;
-  struct dirent *file = &root->entry[fd];
-  strncpy(file->name, filename, strlen(filename));
+  struct filetable *file = &oft[fd];
+  file->state = FSTATE_OPEN;
+  file->fileptr = 0;
+
+  // using dir in oft instead of directory
+  strncpy(file->de->name, filename, strlen(filename));
+  file->de->inode_num = inode_id;
+
+  struct inode *in = &file->in;
+  in->id = inode_id;
+  in->size = 0;
+  in->type = 0;
+  in->nlink = 0;
+  in->blocks[0] = next_open_dblock;
+  next_open_dblock++;
+  for (int i = 1; i < INODEBLOCKS; i++) {
+    in->blocks[i] = -1;
+  }
+  fs_put_inode_by_num(dev0, inode_id, in);
 
   /* printf("file name should be %s\n", file->name); */
   /* printf("file name is %s\n", root->entry[fd].name); */
@@ -68,20 +92,90 @@ int fs_create(char *filename, int mode){
 }
 
 int fs_seek(int fd, int offset){
+  struct filetable *file = &oft[fd];
+  if (file->state == FSTATE_CLOSED) {
+    return SYSERR;
+  }
+  if (file->fileptr < offset) {
+    return SYSERR;
+  }
+
+  file->fileptr += offset;
   return OK;
 }
 
 int fs_read(int fd, void *buf, int nbytes){
-  return OK;
+  struct filetable *file = &oft[fd];
+  if (file->state == FSTATE_CLOSED) {
+    return SYSERR;
+  }
+
+  if (file->fileptr % MDEV_BLOCK_SIZE == 0) {
+    int blocks = nbytes / MDEV_BLOCK_SIZE + 1;
+    int blocks_over = file->fileptr / MDEV_BLOCK_SIZE;
+    for (int i = blocks_over; i < blocks+blocks_over; i++) {
+      bs_bread(dev0, file->in.blocks[i], 0, buf+((i-blocks_over)*MDEV_BLOCK_SIZE), MDEV_BLOCK_SIZE);
+      if (file->in.blocks[i] == -1) {
+        printf("read too much. out of file boundary.\n");
+      }
+    }
+    file->fileptr += nbytes;
+    return nbytes;
+  }
+  else {
+    int blocks = nbytes / MDEV_BLOCK_SIZE + 1;
+    int blocks_over = file->fileptr / MDEV_BLOCK_SIZE;
+    int len = MDEV_NUM_BLOCKS - file->fileptr;
+    bs_bread(dev0, file->in.blocks[blocks_over], file->fileptr, buf, len);
+    file->fileptr += len;
+    fs_read(fd, buf+len, nbytes-len);
+    return nbytes;
+  }
 }
 
 int fs_write(int fd, void *buf, int nbytes){
+  // what if there are already contests in the file
 
+  /* struct dirent *dir = oft[fd].de; */
+  /* printf("its file name is %s\n", oft[fd].de->name); */
+  /* printf("its file name is %s\n", dir->name); */
 
-  /* int bs_bwrite(int dev, int block, int offset, void * buf, int len) */
-  return OK;
+  struct filetable *file = &oft[fd];
+  if (file->state == FSTATE_CLOSED) {
+    return SYSERR;
+  }
+
+  if (file->fileptr % MDEV_BLOCK_SIZE == 0) {
+    int beginning_block;
+    int blocks = nbytes / MDEV_BLOCK_SIZE + 1;
+    for (int i = file->fileptr/MDEV_BLOCK_SIZE; i < blocks; i++) {
+      if (file->in.blocks[i] == -1){
+        beginning_block = next_open_dblock + FIRST_DATA_BLOCK;
+        next_open_dblock++;
+        file->in.blocks[i] = beginning_block;
+        if (next_open_dblock > MDEV_BLOCK_SIZE-1) {
+          printf("running out of data blocks\n");
+          return SYSERR;
+        }
+      }
+      else {
+        beginning_block = file->in.blocks[i];
+          }
+      bs_bwrite(dev0, beginning_block, 0, buf + MDEV_NUM_BLOCKS*(i-file->fileptr/MDEV_NUM_BLOCKS), MDEV_BLOCK_SIZE);
+    }
+    file->fileptr += nbytes;
+    return nbytes;
+  }
+  else{
+    int beginning_block = file->in.blocks[0];
+    int len = MDEV_NUM_BLOCKS - file->fileptr;
+    bs_bwrite(dev0, beginning_block, file->fileptr, buf, len);
+    buf = buf + len;
+    file->fileptr += len;
+    fs_write(fd, buf, nbytes-len);
+    return nbytes;
+  }
 }
-
 
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock) {

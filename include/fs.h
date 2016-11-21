@@ -27,7 +27,7 @@ struct inode {
   short int nlink;
   int device;
   int size;
-  // total 12
+  // total 12, Ptrs to data blocks indexed
   int blocks[INODEBLOCKS];
 };
 
@@ -42,6 +42,8 @@ struct filetable {
 };
 
 struct dirent {
+  // the first i-block ID of the file
+  // this will somehow lead to a inode
   int inode_num;
   char name[FILENAMELEN];
 };
