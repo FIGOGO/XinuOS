@@ -3,7 +3,7 @@
 #include <xinu.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <string.h>
+ <string.h>
 
 extern int dev0_numblocks;
 extern int dev0_blocksize;
@@ -43,6 +43,7 @@ int bs_mkdev(int dev, int blocksize, int numblocks) {
 
 }
 
+// read the data of specific location into the buf
 int bs_bread(int dev, int block, int offset, void *buf, int len) {
   char *bbase;
 
@@ -64,6 +65,7 @@ int bs_bread(int dev, int block, int offset, void *buf, int len) {
 }
 
 
+// write buf data of lenght len onto specific block position
 int bs_bwrite(int dev, int block, int offset, void * buf, int len) {
   char *bbase;
 
@@ -76,8 +78,10 @@ int bs_bwrite(int dev, int block, int offset, void * buf, int len) {
     return SYSERR;
   }
 
+  // find the block
   bbase = &dev0_blocks[block * dev0_blocksize];
 
+  // write the data
   memcpy((bbase+offset), buf, len);
 
   return OK;

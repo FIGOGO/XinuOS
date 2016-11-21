@@ -51,14 +51,18 @@ void testbitmask(void);
 
 #ifdef FS
 
+    // bs_mkdev(0,512,512)
     bs_mkdev(0, MDEV_BLOCK_SIZE, MDEV_NUM_BLOCKS); /* device "0" and default blocksize (=0) and count */
+    // fs_mkfs(0, 128), initial filesystem
     fs_mkfs(0,DEFAULT_NUM_INODES); /* bsdev 0*/
     fs_testbitmask();
+
+    fs_print_fsd();
 
     buf1 = getmem(SIZE*sizeof(char));
     buf2 = getmem(SIZE*sizeof(char));
 
-    // Create test file
+    // Create test file, 0_CREAT=11
     fd = fs_create("Test_File", O_CREAT);
 
     // Fill buffer with random stuff
@@ -72,7 +76,7 @@ void testbitmask(void);
     rval = fs_write(fd,buf1,SIZE);
     if(rval == 0 || rval != SIZE )
     {
-        printf("\n\r File write failed");
+        printf("\n\r File write failed\n");
         goto clean_up;
     }
 
@@ -98,19 +102,21 @@ void testbitmask(void);
         printf("\n\rReturn val for fclose : %d",rval);
     }
 
+
 clean_up:
     freemem(buf1,SIZE);
     freemem(buf2,SIZE);
 
 #else
     printf("No filesystem support\n");
+
 #endif
 
     return OK;
 }
 
 void
-testbitmask(void) {
+fs_testbitmask(void) {
 
     fs_setmaskbit(31); fs_setmaskbit(95); fs_setmaskbit(159);fs_setmaskbit(223);
     fs_setmaskbit(287); fs_setmaskbit(351); fs_setmaskbit(415);fs_setmaskbit(479);

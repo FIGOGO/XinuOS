@@ -27,6 +27,7 @@ struct inode {
   short int nlink;
   int device;
   int size;
+  // total 12
   int blocks[INODEBLOCKS];
 };
 
@@ -47,6 +48,7 @@ struct dirent {
 
 struct directory {
   int numentries;
+  // size = 16
   struct dirent entry[DIRECTORY_SIZE];
 };
 

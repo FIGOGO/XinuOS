@@ -33,6 +33,56 @@ int next_open_fd = 0;
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 /* YOUR CODE GOES HERE */
+int fs_open(char *filename, int flags);
+int fs_close(int fd);
+int fs_create(char *filename, int mode);
+int fs_seek(int fd, int offset);
+int fs_read(int fd, void *buf, int nbytes);
+int fs_write(int fd, void *buf, int nbytes);
+
+// change filetable.state to FSTATE_OPEN
+int fs_open(char *filename, int flags){
+  return OK;
+}
+
+// change filetable.state to FSTATE_CLOSED
+int fs_close(int fd){
+  return OK;
+}
+
+int fs_create(char *filename, int mode){
+  int fd = next_open_fd;
+  next_open_fd++;
+
+  struct filetable *ftb = oft + fd;
+  struct directory *root = &fsd.root_dir;
+  struct dirent *file = &root->entry[fd];
+  strncpy(file->name, filename, strlen(filename));
+
+  /* printf("file name should be %s\n", file->name); */
+  /* printf("file name is %s\n", root->entry[fd].name); */
+  /* strncpy(fsd.root_dir.entry[fd].name, filename, strlen(filename)); */
+  /* printf("file name after change is %s\n", root->entry[fd].name); */
+
+  return fd;
+}
+
+int fs_seek(int fd, int offset){
+  return OK;
+}
+
+int fs_read(int fd, void *buf, int nbytes){
+  return OK;
+}
+
+int fs_write(int fd, void *buf, int nbytes){
+
+
+  /* int bs_bwrite(int dev, int block, int offset, void * buf, int len) */
+  return OK;
+}
+
+
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock) {
   int diskblock;
@@ -151,6 +201,7 @@ int fs_mkfs(int dev, int num_inodes) {
   fs_setmaskbit(BM_BLK);
   bs_bwrite(dev0, BM_BLK, 0, fsd.freemask, fsd.freemaskbytes);
 
+
   return 1;
 }
 
@@ -169,7 +220,7 @@ int fs_setmaskbit(int b) {
   mbyte = b / 8;
   mbit = b % 8;
 
-  fsd.freemask[mbyte] |= (0x80 >> mbit);
+  fsd.freemask[mbyte] |= (0x80 >> mbit); /* 128 >> */
   return OK;
 }
 
