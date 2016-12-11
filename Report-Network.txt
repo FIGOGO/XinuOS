@@ -1,0 +1,33 @@
+17.2
+The vm UDP server client file is under vmUDP file.
+udp_server is compilled to be server
+udp_client is compilled to be client
+Socket files referenced from: http://lobert.iteye.com/blog/1769618
+
+To send a message from xinu to vm:
+   command in vm: ./server
+   command in xinu: udpclient 192.168.1.100
+   Then a message "Xinu says hello to vm" will be sent to vm
+
+To send a message from vm to xinu:
+   command in xinu: udpeserver
+   command in vm: ./client
+   input anything in the vm
+   the message will be sent to xinu
+
+
+17.3
+To test to timeout:
+   command in xinu: ping 192.168.1.100
+   wait for 5 min and repeat the command
+
+
+Future case:
+A new server in xinu: xsh_futureserver
+
+To get a future value from the vm:
+   command in xinu: futureserver
+   command in vm: ./client
+   input an int in vm
+   the int will be sent to future_set to set the future value
+   the final result will be printed in the future_get file
