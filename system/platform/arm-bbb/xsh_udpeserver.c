@@ -71,6 +71,7 @@ shellcmd xsh_udpeserver(int nargs, char *args[])
 			return 1;
 		}
 		msglen = retval;
+		printf("UDP server received: %s",buff); 
 		retval = udp_sendto(slot, remip, remport, buff, msglen);
 		if (retval == SYSERR) {
 			fprintf(stderr, "%s: udp_sendto failed\n",
