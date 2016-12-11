@@ -1,6 +1,7 @@
 #include <xinu.h>
 #include <stdio.h>
 #include <string.h>
+#include <future.h>
 
 shellcmd xsh_futureserver(int nargs, char *args[])
 {
@@ -53,7 +54,7 @@ shellcmd xsh_futureserver(int nargs, char *args[])
   int32 value;
   future *f = future_alloc(FUTURE_EXCLUSIVE);
   resume( create(future_get, 1024, 20, "future_get", 2, f, &value) );
-  printf ('I want a value for futre %d', f);
+  printf ("I want a value for futre %d\n", f);
 	/* Do forever: read an incoming datagram and send it back */
 	while (TRUE) {
 		retval = udp_recvaddr(slot, &remip, &remport, buff,
@@ -67,7 +68,7 @@ shellcmd xsh_futureserver(int nargs, char *args[])
 			return 1;
 		}
 		msglen = retval;
-    int32 val = atoi(buff);
+    int val = atoi(buff);
     future_set(f, &val);
 		printf("Future server received: %s",buff);
 		retval = udp_sendto(slot, remip, remport, buff, msglen);
