@@ -56,7 +56,7 @@ status	arp_resolve (
 	for (i=0; i<ARP_SIZ; i++) {
 		arptr = &arpcache[i];
 		if (arptr->arstate == AR_FREE) {
-			continue;
+		  continue;
 		}
 		if (arptr->arpaddr == nxthop) { /* Adddress is in cache	*/
 			break;
@@ -79,7 +79,9 @@ status	arp_resolve (
 
     if (arptr->arstate == AR_RESOLVED && time_spent >= stale_time) {
       arptr->arstate = AR_FREE;
-    }
+      printf("%u seconds has passed since last check\n", time_spent);
+      printf("time out. need update\n");
+}
 
 		/* Entry is already pending -  return error because	*/
 		/*	only one process can be	waiting at a time	*/
@@ -212,7 +214,7 @@ void	arp_in (
 	}
 
 	if (found) {
-
+	  arptr->time_setup = clktime;
 		/* Update sender's hardware address */
 
 		memcpy(arptr->arhaddr, pktptr->arp_sndha, ARP_HALEN);
@@ -222,6 +224,7 @@ void	arp_in (
 		if (arptr->arstate == AR_PENDING) {
 			/* Mark resolved and notify waiting process */
 			arptr->arstate = AR_RESOLVED;
+			arptr->time_setup = clktime;
 			send(arptr->arpid, OK);
 		}
 	}
