@@ -19,6 +19,7 @@ syscall future_get(future *f, int *i) {
     }
 
     *i = *(*f).value;
+    printf('futre get %d', *i);
     (*f).state = FUTURE_WAITING;
     if (!isbadpid(f->pid) && (*f).pid != current_pid) {
       resume((*f).pid);

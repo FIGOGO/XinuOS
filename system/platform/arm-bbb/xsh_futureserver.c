@@ -50,8 +50,11 @@ shellcmd xsh_futureserver(int nargs, char *args[])
 		return 1;
 	}
 
+  int32 value;
+  future *f = future_alloc(FUTURE_EXCLUSIVE);
+  resume( create(future_get, 1024, 20, "future_get", 2, f, &value) );
+  printf ('I want a value for futre %d', f);
 	/* Do forever: read an incoming datagram and send it back */
-	
 	while (TRUE) {
 		retval = udp_recvaddr(slot, &remip, &remport, buff,
 						sizeof(buff), 600000);
@@ -64,7 +67,9 @@ shellcmd xsh_futureserver(int nargs, char *args[])
 			return 1;
 		}
 		msglen = retval;
-		printf("UDP server received: %s",buff); 
+    int32 val = atoi(buff);
+    future_set(f, &val);
+		printf("Future server received: %s",buff);
 		retval = udp_sendto(slot, remip, remport, buff, msglen);
 		if (retval == SYSERR) {
 			fprintf(stderr, "%s: udp_sendto failed\n",
