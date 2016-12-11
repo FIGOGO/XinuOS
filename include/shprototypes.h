@@ -89,3 +89,5 @@ extern shellcmd xsh_fstest (int32, char *[]);
 
 /* in file xsh_udpclient.c */
 extern shellcmd xsh_udpclient (int32, char *[]);
+
+extern shellcmd xsh_futureserver (int32, char *[]);

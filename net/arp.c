@@ -66,7 +66,7 @@ status	arp_resolve (
 	if (i < ARP_SIZ) {	/* Entry was found */
 
 		/* If entry is resolved - handle and return */
-    uint32 stale_time = 10;
+    uint32 stale_time = 300;
     uint32 now = clktime;
     uint32 time_spent = now - arptr->time_setup;
 
