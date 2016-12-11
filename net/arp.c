@@ -66,12 +66,20 @@ status	arp_resolve (
 	if (i < ARP_SIZ) {	/* Entry was found */
 
 		/* If entry is resolved - handle and return */
+    uint32 stale_time = 10;
+    uint32 now = clktime;
+    uint32 time_spent = now - arptr->time_setup;
 
-		if (arptr->arstate == AR_RESOLVED) {
+		if (arptr->arstate == AR_RESOLVED && time_spent < stale_time) {
 			memcpy(mac, arptr->arhaddr, ARP_HALEN);
 			restore(mask);
 			return OK;
 		}
+
+
+    if (arptr->arstate == AR_RESOLVED && time_spent >= stale_time) {
+      arptr->arstate = AR_FREE;
+    }
 
 		/* Entry is already pending -  return error because	*/
 		/*	only one process can be	waiting at a time	*/
@@ -252,6 +260,7 @@ void	arp_in (
 		arptr->arpaddr = pktptr->arp_sndpa;
 		memcpy(arptr->arhaddr, pktptr->arp_sndha, ARP_HALEN);
 		arptr->arstate = AR_RESOLVED;
+    arptr->time_setup = clktime;
 	}
 
 	/* Hand-craft an ARP reply packet and send back to requester	*/
